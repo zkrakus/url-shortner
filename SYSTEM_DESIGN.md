@@ -21,7 +21,7 @@ Scalability, Latency, Fault Tolerance, CAP Theorem, Durability, Security, Collis
 - Ensure uniqueness of shortenedUrls (avoid Collisions)
 - Strong Consistency or Strong Availability
     - **Consistency:** Does every read of my system need the latest write?
-        - e.g. Ticket booking ... banking application
+        - e.g. Ticket booking ... banking application.
         - We could say no, because there isn't much downside of delaying a user's access to a urls shortly.
     - **High availability** Can we ensure high uptime?
         - We want high availability cuz we def want a redirect to work once it's made.
@@ -79,22 +79,10 @@ flowchart LR
   api --> |insert longUrl| db
   api <--> |select longURL by shortURL| db
 
-  subgraph **Tables**
-    urls[[
-      **URLs**
-      shortUrl
-      longUrl
-      creationTime
-      userId
-      ]]
-    users[[
-      **Users**
-      userId
-      ...
-      ]]
+  subgraph Tables
+    urls[["<b>URLs</b><br/><div style='text-align:left'>• shortUrl/customAlias (pk)<br/>• longUrl<br/>• creationTime<br/>• userId</div>"]]
+    users[["<b>Users</b><br/><div style='text-align:left'>• userId<br/>• ...</div>"]]
   end
-
-  db --- **Tables**
 
 ```
 
@@ -136,3 +124,11 @@ flowchart LR
     - Rate limit
   - Bijective function
     - are functions that issue one to one mapping. (sqids.org)
+
+
+### Latency
+- First bottleneck DB read / write 
+  - Most common db's such as postgres, sqlServer and MySql support clustered indexes on columns. Making the primary key the shortUrl gives us better than O(log(n)) lookup speed for reading data of disks. 
+  - Modern servers also use SSDs giving us microsecond over millisecond response times of older HDDs.
+- In addition to the keys on the database we can also add a cache using an in memory key value store.
+  - we can use something like memcache, or redis being the more rich option.
