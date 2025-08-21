@@ -6,10 +6,10 @@ Basic url shortner built using node js and express.
 Given URL: https://api.example.com/v3/chat/system/logged-in?userId=789&session=abc123
 The service should return the alias https://tinyrl.com/abcd-1234
 
-Traffic volume: 1 x 10^8 URLs generated per day.
-URL Length: Optimize to minumum.
-Character encoding: alphanumeric
-URLs can expire after 1 year.
+- **Traffic Volume:** 1 x 10^8 URLs generated per day.
+- **URL Length:** Optimize to minumum.
+- **Character Encoding:** alphanumeric
+- **URL Expiration**: 1 year.
 Read / Write ratio: 10:1.
 Average URL Length: 100
 How long will this service be expected to run: Indefinite. (**We need a lowerbound for an URL eviction method given current use.**)
