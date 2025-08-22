@@ -63,18 +63,22 @@ N/A
 ## High-level Design
 ```mermaid
 flowchart LR
-  client[**Client**]
-  
-  api[
-    **API**
-    - create shortUrl from longURL
-    - lookup longURL from shortUrl
-    ]
+  client[Client]
+
+  subgraph api["API"]
+    direction TB
+      api_ops["<div style='text-align:left'>• create shortUrl from longURL<br/>• lookup longURL from shortUrl</div>"]
+      counter["<b>Counter</b>"]
+  end
 
   client <--> |POST /urls| api
   client <--> |GET /urls?shortURL <br/> Response: 302 Redirect| api
 
-  db[**Database**]
+  cache[Redis]
+
+  api <--> cache
+
+  db[Database]
 
   api --> |insert longUrl| db
   api <--> |select longURL by shortURL| db
@@ -132,3 +136,20 @@ flowchart LR
   - Modern servers also use SSDs giving us microsecond over millisecond response times of older HDDs.
 - In addition to the keys on the database we can also add a cache using an in memory key value store.
   - we can use something like memcache, or redis being the more rich option.
+  - Read Through
+    - When provided a shortUrl for a longUrl, we first check cache, if we miss we read from db then write to cache then return.
+  - LRU
+    - If we get full, anything that doesn't gets touched kick it.
+
+    key: shortCode
+    value: longUrl 
+
+    Key Value store Lookup is O(1)
+    DB lookup is better then Log(n)
+    
+**Other Options**
+- CDN
+  CDN could be used to reduce latency  between the web server's geo location and the user's current location. This would effectively work as an external cache that would redirect user to traffic before reaching out service.
+  We are going to act against this solution because then we would just 301 redirects instead of 302's. Justification, we want to know if the app is working properly and we want to capture usage analytics. The 302 gives us the same functionlaity leveraging built in browser behavior. This would give us better caching at the edge.
+
+## Scalability
